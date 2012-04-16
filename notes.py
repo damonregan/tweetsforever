@@ -1,4 +1,6 @@
 import sys
+import simplejson
+from HTMLParser import HTMLParser
 
 sys.path.append('./lib')
 
@@ -91,6 +93,15 @@ authToken = authResult.authenticationToken
 print "Authentication was successful for ", user.username
 print "Authentication token = ", authToken
 
+class MLStripper(HTMLParser):
+    def __init__(self):
+        self.reset()
+        self.fed = []
+    def handle_data(self, d):
+        self.fed.append(d)
+    def get_data(self):
+        return ' '.join(self.fed)
+
 noteStoreUrl = "https://sandbox.evernote.com/edam/note/" + user.shardId
 print noteStoreUrl
 
@@ -98,43 +109,19 @@ noteStoreHttpClient = THttpClient.THttpClient(noteStoreUrl)
 noteStoreProtocol = TBinaryProtocol.TBinaryProtocol(noteStoreHttpClient)
 noteStore = NoteStore.Client(noteStoreProtocol)
 
-notebooks = noteStore.listNotebooks(authToken)
-print "Found ", len(notebooks), " notebooks:"
-for notebook in notebooks:
-    print "  * ", notebook.name
-    if notebook.defaultNotebook:
-        defaultNotebook = notebook
+noteFilter = NoteStore.NoteFilter()
 
-print
-print "Creating a new note in default notebook: ", defaultNotebook.name
-print
+notes = noteStore.findNotes(authToken, noteFilter, 0, 10)
+data = []
 
-# Create a note with one image resource in it ...
+for noteShell in notes.notes:
+    note = noteStore.getNote(authToken, noteShell.guid, True)
+    s = MLStripper()
+    s.feed(note.content)
+    data.append(dict(title=note.title, content=s.get_data()))
 
-image = open('enlogo.png', 'rb').read()
-md5 = hashlib.md5()
-md5.update(image)
-hash = md5.digest()
-hashHex = binascii.hexlify(hash)
+f = open('notes_workfile', 'w')
 
-data = Types.Data()
-data.size = len(image)
-data.bodyHash = hash
-data.body = image
+f.write(simplejson.dumps(data, indent=4, sort_keys=True))
 
-resource = Types.Resource()
-resource.mime = 'image/png'
-resource.data = data
-
-note = Types.Note()
-note.title = "Test note from EDAMTest.py"
-note.content = '<?xml version="1.0" encoding="UTF-8"?>'
-note.content += '<!DOCTYPE en-note SYSTEM "http://xml.evernote.com/pub/enml2.dtd">'
-note.content += '<en-note>Here is the Evernote logo:<br/>'
-note.content += '<en-media type="image/png" hash="' + hashHex + '"/>'
-note.content += '</en-note>'
-note.resources = [ resource ]
-
-createdNote = noteStore.createNote(authToken, note)
-
-print "Successfully created a new note with GUID: ", createdNote.guid
+f.close()
