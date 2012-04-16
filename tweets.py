@@ -2,7 +2,7 @@ import ConfigParser
 import tweepy
 
 config = ConfigParser.RawConfigParser()
-config.read('oauth.cfg')
+config.read('../oauth.private.cfg')
 
 consumer_key = config.get("consumer", "consumer-key")
 consumer_secret = config.get("consumer", "consumer-secret")
