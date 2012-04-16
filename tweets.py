@@ -2,6 +2,9 @@ import ConfigParser
 import tweepy
 
 config = ConfigParser.RawConfigParser()
+
+# You need to change this to point to your oauth.cfg
+# containing your oauth credentials
 config.read('../oauth.private.cfg')
 
 consumer_key = config.get("consumer", "consumer-key")
