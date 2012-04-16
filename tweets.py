@@ -1,5 +1,6 @@
 import ConfigParser
 import tweepy
+import simplejson
 
 config = ConfigParser.RawConfigParser()
 
@@ -20,8 +21,13 @@ api = tweepy.API(auth)
 
 statuses = api.home_timeline()
 
+data = []
+
 for status in statuses:
-	print status.id
-	print status.text
-	print status.user.name
-	print "\n"
+    data.append(dict(id=status.id, text=status.text, user=status.user.name))
+
+f = open('tweet_workfile', 'w')
+
+f.write(simplejson.dumps(data, indent=4, sort_keys=True))
+
+f.close()
