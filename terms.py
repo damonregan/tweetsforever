@@ -1,61 +1,52 @@
+import simplejson
 
-text ='''
-... Police shut Palestinian theatre in Jerusalem.
-...
-... Israeli police have shut down a Palestinian theatre in East Jerusalem.
-...
-... The action, on Thursday, prevented the closing event of an international
-... literature festival from taking place.
-...
-... Police said they were acting on a court order, issued after intelligence
-... indicated that the Palestinian Authority was involved in the event.
-...
-... Israel has occupied East Jerusalem since 1967 and has annexed the
-... area. This is not recognised by the international community.
-...
-... The British consul-general in Jerusalem , Richard Makepeace, was
-... attending the event.
-...
-... "I think all lovers of literature would regard this as a very
-... regrettable moment and regrettable decision," he added.
-...
-... Mr Makepeace said the festival's closing event would be reorganised to
-... take place at the British Council in Jerusalem.
-...
-... The Israeli authorities often take action against events in East
-... Jerusalem they see as connected to the Palestinian Authority.
-...
-... Saturday's opening event at the same theatre was also shut down.
-...
-... A police notice said the closure was on the orders of Israel's internal
-... security minister on the grounds of a breach of interim peace accords
-... from the 1990s.
-...
-... These laid the framework for talks on establishing a Palestinian state
-... alongside Israel, but left the status of Jerusalem to be determined by
-... further negotiation.
-...
-... Israel has annexed East Jerusalem and declares it part of its eternal
-... capital.
-...
-... Palestinians hope to establish their capital in the area.
-... '''
+# Load note data
+
+notes_file = open('notes_workfile', 'r')
+
+notes = simplejson.loads(notes_file.read())
+
+# Load tweet data
+
+tweets_file = open('tweet_workfile', 'r')
+
+tweets = simplejson.loads(tweets_file.read())
+
+tweets_file.close()
+notes_file.close()
+
+# Get key terms for notes
 
 from topia.termextract import extract
 extractor = extract.TermExtractor()
 
-extractList = extractor(text)
+for note in notes:
+    note['key_terms'] = [item[0] for item in extractor(note['content'])]
 
-termList = [item[0] for item in extractList]
+# Get key terms for tweets
 
-print termList
+extractor = extract.TermExtractor()
 
+for tweet in tweets:
+    tweet['key_terms'] = [item[0] for item in extractor(tweet['text'] + " " + tweet['user'])]
 
+# Update the tweets and notes files
 
+tweets_file = open('tweet_workfile', 'w')
+notes_file = open('notes_workfile', 'w')
 
+tweets_file.write(simplejson.dumps(tweets, indent=4, sort_keys=True))
+notes_file.write(simplejson.dumps(notes, indent=4, sort_keys=True))
 
+tweets_file.close()
+notes_file.close()
 
+# Look for matches
 
-
-
-
+for note in notes:
+    for tweet in tweets:
+        for note_term in note['key_terms']:
+            for tweet_term in tweet['key_terms']:
+                print "Note term: " + note_term + ", Tweet term: " + tweet_term
+                if note_term in tweet_term:
+                    print "MATCH"
