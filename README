@@ -30,15 +30,16 @@ I modified the `EDAMErrorCode` class to include [enum tostring and fromstring me
          for k,v in vars(cls).iteritems():
            if v == val:
              return k
-      @classmethod
-      def fromstring(cls, str):
-        return getattr(cls, str.upper(), None)
+       
+       @classmethod
+       def fromstring(cls, str):
+         return getattr(cls, str.upper(), None)
 
 and then then modified the errorText statement to be:
 
      errorText = Errors.EDAMErrorCode.tostring(errorCode)
 
-The other issue I had was with `noteStoreUrl.` authResult didn't seem to include it:
+The other issue I had was with `noteStoreUrl` -- authResult didn't seem to include it:
 
      noteStoreHttpClient = THttpClient.THttpClient(authResult.noteStoreUrl)
      AttributeError: 'AuthenticationResult' object has no attribute 'noteStoreUrl'
