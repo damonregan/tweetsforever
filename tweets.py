@@ -1,20 +1,24 @@
-import httplib
-import json
-from pprint import pprint
+import ConfigParser
+import tweepy
 
-host = "api.twtter.com"
-searchHost = "search.twitter.com"
+config = ConfigParser.RawConfigParser()
+config.read('oauth.cfg')
 
-connection = httplib.HTTPConnection(searchHost)
-url = "/search.json?q=%40twitterapi%20%40anywhere"
+consumer_key = config.get("consumer", "consumer-key")
+consumer_secret = config.get("consumer", "consumer-secret")
 
-connection.request("GET", url)
+access_token = config.get("access", "access-token")
+access_token_secret = config.get("access", "access-token-secret")
 
-response = connection.getresponse()
+auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
+auth.set_access_token(access_token, access_token_secret)
 
-jsonData = json.loads(response.read())
+api = tweepy.API(auth)
 
-#pprint(json_data)
+statuses = api.home_timeline()
 
-pprint(jsonData["results"][0])
-
+for status in statuses:
+	print status.id
+	print status.text
+	print status.user.name
+	print "\n"
