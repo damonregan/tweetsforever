@@ -1,6 +1,7 @@
 import sys
 import simplejson
 from HTMLParser import HTMLParser
+import ConfigParser
 
 sys.path.append('./lib')
 
@@ -27,19 +28,17 @@ import evernote.edam.notestore.NoteStore as NoteStore
 import evernote.edam.type.ttypes as Types
 import evernote.edam.error.ttypes as Errors
 
-if len(sys.argv) < 3:
-    print "Arguments:  <username> <password>";
-    exit(1)
+config = ConfigParser.RawConfigParser()
 
-username = sys.argv[1]
-password = sys.argv[2]
+# You need to change this to point to your oauth.cfg
+# containing your oauth credentials
+config.read('../oauth.private.cfg')
 
-#
-# NOTE: You must change the consumer key and consumer secret to the 
-#       key and secret that you received from Evernote
-#       To get an API key, visit http://dev.evernote.com/documentation/cloud/
-consumerKey = "damonregan"
-consumerSecret = "4n178o12o397pq49".encode('rot13')
+username = config.get("evernote", "username")
+password = config.get("evernote", "password")
+
+consumerKey = config.get("evernote", "consumer-key")
+consumerSecret = config.get("evernote", "consumer-secret")
 
 evernoteHost = "sandbox.evernote.com"
 userStoreUri = "https://" + evernoteHost + "/edam/user"

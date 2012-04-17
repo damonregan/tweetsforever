@@ -9,6 +9,7 @@ It uses the [Evernote Cloud API](http://dev.evernote.com/documentation/cloud/), 
 1. Clone repository
 2. pip install tweepy
 3. pip install topia.termextract
+4. pip install simplejson
 
 ## Running
 
