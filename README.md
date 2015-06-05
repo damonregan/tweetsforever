@@ -1,6 +1,6 @@
 ## Overview
 
-A project to explore python a little further while trying to find relevant tweets. Right now, the project is a set of individual experiments with APIs and packages of interest.
+An experimental project to explore python a little further while trying to find relevant tweets. Right now, the project is a set of individual experiments with APIs and packages of interest.
 
 It uses the [Evernote Cloud API](http://dev.evernote.com/documentation/cloud/), [Twitter API](https://dev.twitter.com/docs) through [Tweepy Python Library](https://github.com/tweepy/tweepy), and the [topia.termextract](http://pypi.python.org/pypi/topia.termextract) python package.
 
